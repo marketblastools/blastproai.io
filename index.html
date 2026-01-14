@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI BLAST - Pro Marketblast Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f0f12;
+            --card-bg: #1a1a1f;
+            --accent-color: #6c5ce7;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --gold: #ffd700;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: #000;
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        /* Header & Koin */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+        }
+
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.2rem; }
+        .logo i { color: var(--accent-color); }
+
+        .coin-balance {
+            background: rgba(108, 92, 231, 0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            border: 1px solid var(--accent-color);
+            color: var(--gold);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Dropdown Utama */
+        .dropdown-container { position: relative; margin: 15px 0; }
+        .dropdown-main {
+            background: #1e1e24;
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        /* Dropdown Menus */
+        .drop-menu {
+            position: absolute;
+            top: 100%; left: 0; width: 100%;
+            background: #25252b;
+            border: 1px solid #444;
+            border-radius: 15px;
+            list-style: none;
+            padding: 10px 0;
+            margin: 5px 0;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .drop-menu li {
+            padding: 12px 20px;
+            display: flex; align-items: center; gap: 12px;
+            cursor: pointer;
+        }
+
+        .drop-menu li:hover { background: rgba(108, 92, 231, 0.2); color: var(--accent-color); }
+
+        /* Search & Preview */
+        .search-bar {
+            background: #16161c;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex; gap: 10px;
+        }
+
+        .search-bar input { background: none; border: none; color: white; flex: 1; outline: none; }
+
+        .preview-card {
+            height: 80px;
+            background: linear-gradient(45deg, #1e1e24, #2c3e50);
+            border-radius: 15px;
+            margin-top: 20px;
+            position: relative;
+            padding: 10px;
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+
+        .thumbnail-list { display: flex; gap: 2px; overflow-x: auto; }
+        .thumb {
+            min-width: 60px; height: 60px; border-radius: 8px;
+            background: #333; border: 2px solid transparent;
+            cursor: pointer; font-size: 8px; display: flex; align-items: flex-end; padding: 3px;
+        }
+        .thumb.active { border-color: var(--accent-color); }
+
+        /* Model Selector */
+        .setting-item {
+            background: var(--card-bg); margin-top: 15px;
+            padding: 15px; border-radius: 12px;
+            display: flex; justify-content: space-between; cursor: pointer;
+        }
+
+        /* Upload Area */
+        .upload-section {
+            background: var(--card-bg); border: 1px solid #333;
+            border-radius: 15px; padding: 15px; margin-top: 20px;
+            display: flex; gap: 15px;
+        }
+
+        .upload-box {
+            width: 100px; height: 100px;
+            border: 2px dashed var(--accent-color);
+            border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; cursor: pointer;
+            background-size: cover; background-position: center;
+        }
+
+        /* Grid Controls */
+        .grid-settings {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; margin-top: 20px;
+        }
+
+        .grid-btn {
+            background: var(--card-bg); padding: 12px;
+            border-radius: 10px; display: flex; justify-content: space-between;
+            cursor: pointer; position: relative;
+        }
+
+        /* Generate Button */
+        .btn-generate {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%); width: 90%; max-width: 400px;
+            background: var(--accent-color); color: white;
+            border: none; padding: 16px; border-radius: 30px;
+            font-weight: bold; cursor: pointer; font-size: 1rem;
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+            z-index: 500;
+        }
+
+        /* Premium Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #1e1e24; width: 85%; max-width: 350px;
+            padding: 30px; border-radius: 20px; text-align: center;
+            border: 1px solid var(--accent-color);
+        }
+
+        .modal-content i.fa-crown { font-size: 3rem; color: var(--gold); margin-bottom: 15px; }
+
+        /* Helpers */
+        .hidden { display: none !important; }
+        .hint { color: var(--text-dim); font-size: 0.75rem; margin-top: 5px; }
+        .processing { opacity: 0.7; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo"><i class="fas fa-play-circle"></i> AI BLAST</div>
+        <div class="coin-balance">
+            <i class="fas fa-coins"></i> <span id="userCoins">1000</span>
+        </div>
+    </header>
+
+    <div class="dropdown-container">
+        <div class="dropdown-main" onclick="toggleMenu('mainDrop')">
+            <span><i id="mainIcon" class="fas fa-images"></i> <b id="mainLabel">Image to Video</b></span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <ul id="mainDrop" class="drop-menu hidden">
+            <li onclick="selectMainMode('Image to Video', 'fas fa-images')"><i class="fas fa-images"></i> Image to Video</li>
+            <li onclick="selectMainMode('Text to Video', 'fas fa-file-alt')"><i class="fas fa-file-alt"></i> Text to Video</li>
+            <li onclick="selectMainMode('Video to Video', 'fas fa-video')"><i class="fas fa-video"></i> Video to Video</li>
+        </ul>
+    </div>
+
+    <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Gaya visual...">
+        <i class="fas fa-ellipsis-v"></i>
+    </div>
+
+    <div class="preview-card">
+        <div class="thumbnail-list">
+            <div class="thumb active" onclick="activateThumb(this)"><img src="hhh.jpg">Fashion</div>
+            <div class="thumb" onclick="activateThumb(this)">Cinematic</div>
+            <div class="thumb" onclick="activateThumb(this)">Cyberpunk</div>
+            <div class="thumb" onclick="activateThumb(this)">Digital</div>
+            <div class="thumb" onclick="activateThumb(this)">Anime</div>
+        </div>
+    </div>
+
+    <div class="dropdown-container">
+        <div class="setting-item" onclick="toggleMenu('modelDrop')">
+            <div class="model-info"><i class="fas fa-atom"></i> <span id="modelLabel">Sesuaikan</span></div>
+            <span class="label">Pilih model <i class="fas fa-chevron-down"></i></span>
+        </div>
+        <ul id="modelDrop" class="drop-menu hidden" style="top: auto; bottom: 100%;">
+            <li onclick="selectModel('Blast Basic')"><i class="fas fa-bolt"></i> Blast basic</li>
+            <li onclick="selectModel('Blast Pro (Ultra)')"><i class="fas fa-crown"></i> Blast Pro</li>
+            <li onclick="selectModel('Gen-2 Realism')"><i class="fas fa-camera"></i> Gen-2 Realism</li>
+        </ul>
+    </div>
+    <p class="hint">Model mempengaruhi kualitas dan kecepatan render.</p>
+
+    <div class="upload-section">
+        <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-plus"></i>
+            <span style="font-size: 10px; margin-top:5px;">Bingkai Awal</span>
+        </div>
+        <div class="upload-info">
+            <p style="font-size: 0.8rem; margin: 0;">Animasi gambar ini dengan gerakan kamera halus.</p>
+            <div style="margin-top: 15px; color: var(--text-dim); font-size: 0.8rem;">
+                <i class="fas fa-plus-circle"></i> <i class="fas fa-user-astronaut"></i> 
+                <span style="float: right;">72/2000</span>
+            </div>
+        </div>
+        <input type="file" id="fileInput" hidden accept="image/*" onchange="handleFile(this)">
+    </div>
+
+    <div class="grid-settings">
+        <div class="grid-btn" onclick="toggleMenu('dropV')">
+            <span id="labelV">1 Video</span> <i class="fas fa-chevron-down"></i>
+            <ul id="dropV" class="drop-menu hidden" style="bottom: 100%; top: auto;">
+                <li onclick="updateSet('labelV', '1 Video')">1 Video</li>
+                <li onclick="updateSet('labelV', '2 Video')">2 Video</li>
+                <li onclick="updateSet('labelV', '5 Video')">5 Video</li>
+            </ul>
+        </div>
+        <div class="grid-btn" onclick="toggleMenu('dropT')">
+            <span id="labelT">5s</span> <i class="fas fa-chevron-down"></i>
+            <ul id="dropT" class="drop-menu hidden" style="bottom: 100%; top: auto;">
+                <li onclick="updateSet('labelT', '8s')">8s</li>
+                <li onclick="updateSet('labelT', '10s')">10s</li>
+                <li onclick="updateSet('labelT', '60s')">60s</li>
+            </ul>
+        </div>
+    </div>
+
+    <button class="btn-generate" id="generateBtn">
+        <span id="btnTxt">Menghasilkan 3 <i class="fas fa-coins"></i></span>
+        <span id="btnLoad" class="hidden"><i class="fas fa-spinner fa-spin"></i> Memproses AI...</span>
+    </button>
+</div>
+
+<div id="premiumModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <i class="fas fa-crown"></i>
+        <h2>Upgrade Premium</h2>
+        <p style="font-size: 0.9rem; color: #ccc;">Fitur resolusi 4K dan tanpa antrean hanya untuk member Premium.</p>
+       
+        <p onclick="closePremium()" style="margin-top:15px; cursor:pointer; font-size:0.8rem; color:#888;">Mungkin Nanti</p>
+    </div>
+</div>
+
+<script>
+    let coins = 100;
+    let hasImage = false;
+
+    // --- FUNGSI DROPDOWN ---
+    function toggleMenu(id) {
+        event.stopPropagation();
+        const el = document.getElementById(id);
+        const menus = document.querySelectorAll('.drop-menu');
+        menus.forEach(m => { if(m.id !== id) m.classList.add('hidden'); });
+        el.classList.toggle('hidden');
+    }
+
+    window.onclick = () => {
+        document.querySelectorAll('.drop-menu').forEach(m => m.classList.add('hidden'));
+    };
+
+    function selectMainMode(txt, icon) {
+        document.getElementById('mainLabel').innerText = txt;
+        document.getElementById('mainIcon').className = icon;
+    }
+
+    function selectModel(txt) {
+        document.getElementById('modelLabel').innerText = txt;
+    }
+
+    function updateSet(id, val) {
+        document.getElementById(id).innerText = val;
+    }
+
+    function activateThumb(el) {
+        document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    // --- FUNGSI UPLOAD ---
+    function handleFile(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const box = document.getElementById('uploadBox');
+                box.style.backgroundImage = `url(${e.target.result})`;
+                box.innerHTML = '';
+                hasImage = true;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // --- PROSES GENERATE & PREMIUM ---
+    const genBtn = document.getElementById('generateBtn');
+    const premiumModal = document.getElementById('premiumModal');
+
+    genBtn.onclick = () => {
+        if (!hasImage) {
+            alert("Silakan unggah gambar terlebih dahulu!");
+            return;
+        }
+        // Tampilkan Modal Premium
+        premiumModal.classList.remove('hidden');
+    };
+
+    function closePremium() {
+        premiumModal.classList.add('hidden');
+    }
+
+    function confirmPremium() {
+        premiumModal.classList.add('hidden');
+        if (coins < 8) {
+            alert("Koin tidak cukup!");
+            return;
+        }
+
+        // Jalankan Animasi Loading
+        document.getElementById('btnTxt').classList.add('hidden');
+        document.getElementById('btnLoad').classList.remove('hidden');
+        genBtn.classList.add('processing');
+        genBtn.disabled = true;
+
+        setTimeout(() => {
+            coins -= 8;
+            document.getElementById('userCoins').innerText = coins;
+            
+            // Selesai
+            document.getElementById('btnTxt').classList.remove('hidden');
+            document.getElementById('btnLoad').classList.add('hidden');
+            genBtn.classList.remove('processing');
+            genBtn.disabled = false;
+            
+            alert("✨ Berhasil! Video AI sedang diproses.");
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
